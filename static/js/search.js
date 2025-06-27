@@ -1,8 +1,12 @@
+function truncateChars(str, n) {
+    return str.length > n ? str.slice(0, n) + '…' : str;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const clearBtn = document.getElementById('clearSearch');
-
     const resultsContainer = document.createElement('div');
+    
     resultsContainer.classList.add("grid", "grid-cols-2", "sm:grid-cols-3", "md:grid-cols-4", "lg:grid-cols-6", "gap-4", "mt-4");
     searchInput.closest("form").insertAdjacentElement("afterend", resultsContainer);
 
@@ -38,11 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         const item = document.createElement('a');
                         item.href = anime.url;
                         item.innerHTML = `
-                            <div class="shadow-md overflow-hidden">
-                                <img src="${anime.image}" alt="${anime.title}" class="w-full object-cover rounded-sm">
+                            <div class="hover-card shadow-md overflow-hidden">
+                                <img src="${anime.image}" alt="${anime.title}" class="h-[350px] object-cover rounded-sm">
                                 <div class="p-2">
-                                    <h2 class="text-sm font-bold text-center text-white">${anime.title}</h2>
-                                    <p class="text-xs text-gray-200 text-center">${anime.total_episodes} Episodios</p>
+                                    <h2 class="text-md font-bold text-center text-white">${anime.title}</h2>
+                                </div>
+                                <div class="hover-overlay">
+                                    <h2 class="text-sm font-bold text-white">${anime.title}</h2>
+                                    <p class="text-sm font-semibold text-gray-400 pt-3">${anime.total_episodes} Episodios</p>
+                                    <p class="text-sm pt-2 text-white ">${ truncateChars(anime.description, 150) }</p>
                                 </div>
                             </div>
                         `;

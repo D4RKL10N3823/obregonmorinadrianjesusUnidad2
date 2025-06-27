@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.core.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/glide.min.js"></script>
     <script src="{% static 'js/header.js' %}"></script>
+    {% block extra_head %}{% endblock %}
     {% block extra_scripts %}{% endblock %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <title>{% block title %}Mi sitio{% endblock %}</title>

@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.shortcuts import redirect, render, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.views import View
 from django.views.generic import TemplateView  
 from django.views.generic.list import ListView
@@ -12,12 +12,10 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import EmailMessage
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from .forms import CustomUserCreationForm, ContactForm, SuggestionForm, HelpMessageForm
-from .models import Anime, User, Episode, Comment, Conversation, Suggestion
+from .models import Anime, User, Episode, Comment, Conversation, Suggestion, Category
 from .utils.recaptcha import verify_recaptcha
-from django.http import JsonResponse
-from django.urls import reverse
 
 # Vista del mapa del sitio
 class SiteMapView(TemplateView):  
@@ -85,8 +83,20 @@ class Profile(LoginRequiredMixin, UpdateView):
 # Vista para mostrar los animes en el index
 class AnimeList(ListView):
     model = Anime
-    context_object_name = 'animes'
     template_name = 'index.html'
+    context_object_name = 'animes'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        categorias = (
+            Category.objects
+            .filter(animes__isnull=False) 
+            .distinct()
+            .prefetch_related('animes')     
+        )
+        context['categories'] = categorias
+        return context
 
 
 # Vista para hacer busquedas de los animes
@@ -99,11 +109,13 @@ class SearchBar(ListView):
         query = self.request.GET.get('search', '')
         return Anime.objects.filter(title__icontains=query) if query else Anime.objects.all()
 
+    # Búsqueda
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search_value'] = self.request.GET.get('search', '')
         return context
 
+    # Búsqueda asincrona
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             data = [
@@ -111,6 +123,7 @@ class SearchBar(ListView):
                     "title": anime.title,
                     "total_episodes": anime.total_episodes,
                     "image": anime.image_card.url,
+                    "description": anime.description,
                     "url": reverse('anime_detail', args=[anime.title])
                 }
                 for anime in context['animes']

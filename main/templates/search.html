@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block extra_scripts %}
-    <script src="{% static 'js/search.js' %}"></script>
-{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/cards.css'%}">{% endblock %}
+
+{% block extra_scripts %}<script src="{% static 'js/search.js' %}?v=2"></script>{% endblock %}
 
 {% block title %}Buscador{% endblock %}
 {% block content %}
@@ -27,25 +27,29 @@
                 <!-- Mostrar los resultados de la busqueda -->
                 {% if animes %}
                     {% for anime in animes %}
-                        <a href="{% url 'anime_detail' anime.title %}">
-                            <div class="shadow-md overflow-hidden">
-                                <img src="{{ anime.image_card.url }}" alt="{{ anime.title }}" class="w-full object-cover rounded-sm">
+                        <a href="{% url 'anime_detail' anime.title %}" class="block w-[250px]">
+                            <div class="hover-card shadow-md overflow-hidden">
+                                <img src="{{ anime.image_card.url }}" alt="{{ anime.title }}" class="h-[350px] object-cover rounded-sm">
                                 <div class="p-2">
-                                    <h2 class="text-sm font-bold text-center text-white">{{ anime.title }}</h2>
-                                    <p class="text-xs text-gray-200 text-center">{{ anime.total_episodes }} Episodios</p>
+                                    <h2 class="text-md font-bold text-center text-white">{{ anime.title }}</h2>
+                                </div>
+                                <div class="hover-overlay">
+                                    <h3 class="text-sm font-bold text-white">{{ anime.title }}</h3>
+                                    <p class="text-sm font-semibold text-gray-400 pt-3">{{ anime.total_episodes }} Episodios</p>
+                                    <p class="text-sm pt-2 text-white">{{ anime.description|truncatechars:150 }}</p>
                                 </div>
                             </div>
                         </a>
-                        {% endfor %}
-                    {% else %}
-                        <div class="col-span-full  items-center justify-center text-center mt-8">
-                            <h2 class="text-white text-xl font-semibold mb-2">No se encontraron resultados</h2>
-                            <p class="text-gray-400">No hay animes que coincidan con "<strong>{{ search_value }}</strong>"</p>
-                            <img src="{% static 'images/not_found.gif' %}" alt="No results" class="mx-auto mt-4 w-22">
-                            <a href="{% url 'anime_list' %}" class="inline-block mt-4 text-yellow-400 hover:underline">Volver a ver todos</a>
-                        </div>
-                    {% endif %}
-                </div>
-            </main>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-span-full  items-center justify-center text-center mt-8">
+                        <h2 class="text-white text-xl font-semibold mb-2">No se encontraron resultados</h2>
+                        <p class="text-gray-400">No hay animes que coincidan con "<strong>{{ search_value }}</strong>"</p>
+                        <img src="{% static 'images/not_found.gif' %}" alt="No results" class="mx-auto mt-4 w-22">
+                        <a href="{% url 'anime_list' %}" class="inline-block mt-4 text-yellow-400 hover:underline">Volver a ver todos</a>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
     {% endif %}
 {% endblock %}

@@ -1,59 +1,59 @@
 {% extends "base.html" %}
-{% load static %}´
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.core.min.css">
+    <link rel="stylesheet" href="{% static 'css/cards.css' %}">
+{% endblock %}
+
 {% block extra_scripts %}
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (document.querySelector('.glide')) {
-                new Glide('.glide', {
-                    type: 'carousel',
-                    perView: 7,
-                    gap: 20,
-                    breakpoints: {
-                        1280: { perView: 4 },
-                        1024: { perView: 3 },
-                        768:  { perView: 2 },
-                        480:  { perView: 1 }
-                    }
-                }).mount();
-            }
-        });
-    </script>
+    <script src="{% static 'js/carousel.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/glide.min.js"></script>
 {% endblock %}
 
 {% block title %}Inicio{% endblock %}
 
 {% block content %}
-    <div class="glide">
-        <div class="glide__track" data-glide-el="track">
-            <ul class="glide__slides">
-            {% for anime in animes %}
-                <li class="glide__slide">
-                    <a href="{% url 'anime_detail' anime.title %}" class="block w-[210px]">
-                        <div class="shadow-md overflow-hidden">
-                            <img src="{{ anime.image_card.url }}" alt="{{ anime.title }}" class="h-[300px] object-cover rounded-sm">
-                            <div class="p-2">
-                                <h2 class="text-sm font-bold text-center text-white">{{ anime.title }}</h2>
-                                <p class="text-xs text-gray-200 text-center">{{ anime.total_episodes }} Episodios</p>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-            {% endfor %}
-            </ul>
-        </div>
+    {% for category in categories %}
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4">{{ category.name }}</h2>
 
-        <div class="glide__arrows absolute top-[40%] w-full flex justify-between z-10 pointer-events-none" data-glide-el="controls">
-            <button class="glide__arrow glide__arrow--left hover:text-gray-200 text-white pointer-events-auto" data-glide-dir="<">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
-            <button class="glide__arrow glide__arrow--right hover:text-gray-200 text-white pointer-events-auto" data-glide-dir=">" >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-            </button>
-        </div>
-    </div>
+            <div class="glide group relative overflow-hidden">
+                <div class="glide__track pr-[105px]" data-glide-el="track">
+                    <ul class="glide__slides">
+                        {% for anime in category.animes.all %}
+                            <li class="glide__slide">
+                                <a href="{% url 'anime_detail' anime.title %}" class="block w-[250px]">
+                                    <div class="hover-card shadow-md overflow-hidden">
+                                        <img src="{{ anime.image_card.url }}" alt="{{ anime.title }}" class="h-[350px] object-cover rounded-sm">
+                                        <div class="p-2">
+                                            <h2 class="text-md font-bold text-center text-white">{{ anime.title }}</h2>
+                                        </div>
+                                        <div class="hover-overlay">
+                                            <h2 class="text-ssm font-bold text-white">{{ anime.title }}</h2>
+                                            <p class="text-sm font-semibold text-gray-400 pt-3">{{ anime.total_episodes }} Episodios</p>
+                                            <p class="text-sm pt-2 text-white">{{ anime.description|truncatechars:150 }}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
 
+                <div class="glide__arrows absolute inset-0 z-10 flex justify-between pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" data-glide-el="controls">
+                    <button class="glide__arrow glide__arrow--left pointer-events-auto w-[10%] h-full flex items-center justify-start bg-gradient-to-r from-black/30 to-transparent transition-opacity duration-300" data-glide-dir="<">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white ml-2" viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button class="glide__arrow glide__arrow--right pointer-events-auto w-[10%] h-full flex items-center justify-end bg-gradient-to-l from-black/30 to-transparent transition-opacity duration-300" data-glide-dir=">">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white mr-2" viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>    
+        </section>
+    {% endfor %}
 {% endblock %}
