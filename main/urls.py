@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import SiteMapView, Signup, Login, AnimeList, AnimeDetail, EpisodeDetail, SearchBar,  Profile, Help, ContactView, SuggestionView, RedirectToConversation, ConversationList, HelpChat
+from .views import SiteMapView, Signup, Login, AnimeList, AnimeDetail, EpisodeDetail, SearchBar, Profile, Help, ContactView, SuggestionView, RedirectToConversation, ConversationList, HelpChat
 
 # URLs para poder acceder a las vistas de la aplicación
 urlpatterns = [

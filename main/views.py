@@ -16,6 +16,8 @@ from django.urls import reverse_lazy
 from .forms import CustomUserCreationForm, ContactForm, SuggestionForm, HelpMessageForm
 from .models import Anime, User, Episode, Comment, Conversation, Suggestion
 from .utils.recaptcha import verify_recaptcha
+from django.http import JsonResponse
+from django.urls import reverse
 
 # Vista del mapa del sitio
 class SiteMapView(TemplateView):  
@@ -93,15 +95,29 @@ class SearchBar(ListView):
     context_object_name = 'animes'
     template_name = 'search.html'
 
-    # Hace la búsqueda de los animes
+    def get_queryset(self):
+        query = self.request.GET.get('search', '')
+        return Anime.objects.filter(title__icontains=query) if query else Anime.objects.all()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        search_value = self.request.GET.get('search') or ''
-
-        if search_value:
-            context['animes'] = context['animes'].filter(title__icontains=search_value)
-        context['search_value'] = search_value
+        context['search_value'] = self.request.GET.get('search', '')
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            data = [
+                {
+                    "title": anime.title,
+                    "total_episodes": anime.total_episodes,
+                    "image": anime.image_card.url,
+                    "url": reverse('anime_detail', args=[anime.title])
+                }
+                for anime in context['animes']
+            ]
+            return JsonResponse(data, safe=False)
+        else:
+            return super().render_to_response(context, **response_kwargs)
 
 
 # Vista de ayuda

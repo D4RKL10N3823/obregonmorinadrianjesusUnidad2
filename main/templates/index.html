@@ -1,20 +1,59 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static %}´
+{% block extra_scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.querySelector('.glide')) {
+                new Glide('.glide', {
+                    type: 'carousel',
+                    perView: 7,
+                    gap: 20,
+                    breakpoints: {
+                        1280: { perView: 4 },
+                        1024: { perView: 3 },
+                        768:  { perView: 2 },
+                        480:  { perView: 1 }
+                    }
+                }).mount();
+            }
+        });
+    </script>
+{% endblock %}
 
 {% block title %}Inicio{% endblock %}
 
 {% block content %}
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-        {% for anime in animes %}
-            <a href="{% url 'anime_detail' anime.title %}" class="w-[210px]">
-                <div class="shadow-md overflow-hidden">
-                    <img src="{{ anime.image_card.url }}" alt="{{ anime.title }}" class="h-[300px] object-cover rounded-sm">
-                    <div class="p-2">
-                        <h2 class="text-sm font-bold text-center text-white">{{ anime.title }}</h2>
-                        <p class="text-xs text-gray-200 text-center">{{ anime.total_episodes }} Episodios</p>
-                    </div>
-                </div>
-            </a>
-        {% endfor %}
+    <div class="glide">
+        <div class="glide__track" data-glide-el="track">
+            <ul class="glide__slides">
+            {% for anime in animes %}
+                <li class="glide__slide">
+                    <a href="{% url 'anime_detail' anime.title %}" class="block w-[210px]">
+                        <div class="shadow-md overflow-hidden">
+                            <img src="{{ anime.image_card.url }}" alt="{{ anime.title }}" class="h-[300px] object-cover rounded-sm">
+                            <div class="p-2">
+                                <h2 class="text-sm font-bold text-center text-white">{{ anime.title }}</h2>
+                                <p class="text-xs text-gray-200 text-center">{{ anime.total_episodes }} Episodios</p>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+
+        <div class="glide__arrows absolute top-[40%] w-full flex justify-between z-10 pointer-events-none" data-glide-el="controls">
+            <button class="glide__arrow glide__arrow--left hover:text-gray-200 text-white pointer-events-auto" data-glide-dir="<">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <button class="glide__arrow glide__arrow--right hover:text-gray-200 text-white pointer-events-auto" data-glide-dir=">" >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
     </div>
+
 {% endblock %}
