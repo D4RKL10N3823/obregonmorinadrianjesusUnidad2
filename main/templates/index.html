@@ -7,16 +7,18 @@
 {% endblock %}
 
 {% block extra_scripts %}
-    <script src="{% static 'js/carousel.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/glide.min.js"></script>
+    <script src="{% static 'js/carousel.js' %}?v=2"></script>
+    
 {% endblock %}
 
 {% block title %}Inicio{% endblock %}
 
 {% block content %}
+
     {% for category in categories %}
         <section class="mb-12">
-            <h2 class="text-2xl font-bold text-white mb-4">{{ category.name }}</h2>
+            <h2 class="text-2xl font-bold w-1 text-white mb-4 category-title cursor-pointer">{{ category.name }}</h2>
 
             <div class="glide group relative overflow-hidden">
                 <div class="glide__track pr-[105px]" data-glide-el="track">
@@ -56,4 +58,6 @@
             </div>    
         </section>
     {% endfor %}
+
+    <script type="application/json" id="categories-data">{{ categories_json|safe }}</script>
 {% endblock %}

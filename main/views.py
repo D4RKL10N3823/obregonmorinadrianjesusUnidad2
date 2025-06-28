@@ -12,10 +12,12 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import EmailMessage
 from django.core.exceptions import PermissionDenied
+from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse_lazy, reverse
 from .forms import CustomUserCreationForm, ContactForm, SuggestionForm, HelpMessageForm
 from .models import Anime, User, Episode, Comment, Conversation, Suggestion, Category
 from .utils.recaptcha import verify_recaptcha
+import json
 
 # Vista del mapa del sitio
 class SiteMapView(TemplateView):  
@@ -95,7 +97,18 @@ class AnimeList(ListView):
             .distinct()
             .prefetch_related('animes')     
         )
+
         context['categories'] = categorias
+
+        # Agregamos los animes por categoría en un dict serializable
+        categorias_json = {}
+        for i, categoria in enumerate(categorias, start=1):
+            animes = categoria.animes.all().values('title')
+            categorias_json[f'animes-{i}'] = list(animes)
+
+        # Convertimos a JSON para pasarlo como un único bloque al template
+        context['categories_json'] = json.dumps(categorias_json, cls=DjangoJSONEncoder)
+
         return context
 
 
