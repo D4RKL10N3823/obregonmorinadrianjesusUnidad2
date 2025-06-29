@@ -2,7 +2,7 @@
 {% load static %}
 {% load form_filters %}
 
-{% block extra_scripts %}<script src="{% static 'js/chat.js' %}?v=2"></script>{% endblock %}
+{% block extra_scripts %}<script src="{% static 'js/chat.js' %}"></script>{% endblock %}
 
 {% block title %}Chat de Ayuda{% endblock %}
 {% block content %}
@@ -10,39 +10,7 @@
 
     <!-- Mostrar Mensajes -->
     <div class="[background-color:#11111F] relative w-1/2 mx-auto rounded-lg" style="height:650px;">
-        <div id="chat-box" class="overflow-y-auto h-[600px] p-4 space-y-2">
-            {% for msg in chat_messages %}
-                {% if msg.sender == request.user %}
-                    <!-- Mostrar los mensajes que envio el usuario -->
-                    <div class="flex justify-end">
-                        <div class="flex items-end gap-2 max-w-[70%]">
-                            <div class="[background-color:#FFBC0E] text-black p-3 rounded-lg rounded-br-none">
-                                <p>{{ msg.message }}</p>
-                                <small class="text-gray-800 text-xs">{{ msg.created_at }}</small>
-                            </div>
-                            <img src="{% if msg.sender.icon %}{{ msg.sender.icon.url }}{% else %}{% static 'default_icon.png' %}{% endif %}"
-                                alt="{{ msg.sender.username }}"
-                                class="w-8 h-8 rounded-full object-cover">
-                        </div>
-                    </div>
-                {% else %}
-                    <!-- Mostrar los mensajes que se enviaron al usuario -->
-                    <div class="flex justify-start">
-                        <div class="flex items-end gap-2 max-w-[70%]">
-                            <img src="{% if msg.sender.icon %}{{ msg.sender.icon.url }}{% endif %}"
-                                alt="{{ msg.sender.username }}"
-                                class="w-8 h-8 rounded-full object-cover">
-                            <div class="bg-gray-800 text-white p-3 rounded-lg rounded-bl-none">
-                                <p><strong>{{ msg.sender.username }}</strong>: {{ msg.message }}</p>
-                                <small class="text-gray-300 text-xs">{{ msg.created_at }}</small>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-            {% empty %}
-                <p class="text-white">No hay mensajes aún.</p>
-            {% endfor %}
-        </div>
+        <div id="chat-box" class="overflow-y-auto h-[600px] p-4 space-y-2"></div>
 
         <!-- Enviar mensaje -->
         <form method="post" class="absolute bottom-0 left-0 right-0 p-2" id="message-form">
@@ -57,5 +25,7 @@
             </div>
         </form>
     </div>
+
+    <!-- Pasamos el ID al script -->
     {{ conversation.pk|json_script:"conversationId" }}
 {% endblock %}

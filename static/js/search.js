@@ -13,12 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchInput.focus();
 
+     // Se activa cada vez que el usuario escribe en el campo de búsqueda
     searchInput.addEventListener('input', async () => {
         const query = searchInput.value.trim();
         if (query !== '') {
             clearBtn.classList.remove('hidden');
 
             try {
+                // Petición asíncrona con fetch al backend
                 const res = await fetch(`/search/?search=${encodeURIComponent(query)}`, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
@@ -40,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 } else {
                     data.forEach(anime => {
+                        // Si hay resultados, iterar sobre cada uno y renderizarlos
                         const item = document.createElement('a');
                         item.href = anime.url;
                         item.innerHTML = `
@@ -67,10 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Botón para limpiar búsqueda
     clearBtn.addEventListener('click', () => {
         searchInput.value = '';
         clearBtn.classList.add('hidden');
         resultsContainer.innerHTML = '';
     });
 });
-

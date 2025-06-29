@@ -4,13 +4,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const commentsContainer = document.querySelector('#comment-container');
     let lastTimestamp = window.initialTimestamp || 0;
 
+    // Comentarios de forma asíncrona
     async function commentAsync() {
         try {
+            // Realiza una petición GET al servidor solicitando comentarios nuevos desde el último timestamp
             const response = await fetch(`${window.location.pathname}?comment=1&after=${lastTimestamp}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
 
             const data = await response.json();
+            // Si hay comentarios nuevos mostrarlos
             if (data.length > 0) {
                 data.forEach(comment => {
                     if (comment.timestamp > lastTimestamp) {
@@ -52,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Envia el formulario de forma asíncrona
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
         const formData = new FormData(form);
@@ -63,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         form.reset();
     });
 
+    // Envia el comentario solo presionando enter
     commentInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
