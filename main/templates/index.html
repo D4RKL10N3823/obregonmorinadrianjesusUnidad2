@@ -8,8 +8,7 @@
 
 {% block extra_scripts %}
     <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/glide.min.js"></script>
-    <script src="{% static 'js/carousel.js' %}?v=2"></script>
-    
+    <script src="{% static 'js/carousel.js' %}"></script>
 {% endblock %}
 
 {% block title %}Inicio{% endblock %}
@@ -18,7 +17,8 @@
 
     {% for category in categories %}
         <section class="mb-12">
-            <h2 class="text-2xl font-bold w-1 text-white mb-4 category-title cursor-pointer">{{ category.name }}</h2>
+            <!-- Carrusel de las diferentes categorias con las cards de los animes -->
+            <h2 class="text-2xl font-bold w-[10%] text-white mb-4 category-title cursor-pointer">{{ category.name }}</h2>
 
             <div class="glide group relative overflow-hidden">
                 <div class="glide__track pr-[105px]" data-glide-el="track">
@@ -31,6 +31,7 @@
                                         <div class="p-2">
                                             <h2 class="text-md font-bold text-center text-white">{{ anime.title }}</h2>
                                         </div>
+                                        <!-- Al pasar el mouse por arriba de la card del anime se muestra la descripcion y capitulos del anime -->
                                         <div class="hover-overlay">
                                             <h2 class="text-ssm font-bold text-white">{{ anime.title }}</h2>
                                             <p class="text-sm font-semibold text-gray-400 pt-3">{{ anime.total_episodes }} Episodios</p>
@@ -43,6 +44,7 @@
                     </ul>
                 </div>
 
+                <!-- Flechas para manejar el carrusel -->
                 <div class="glide__arrows absolute inset-0 z-10 flex justify-between pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" data-glide-el="controls">
                     <button class="glide__arrow glide__arrow--left pointer-events-auto w-[10%] h-full flex items-center justify-start bg-gradient-to-r from-black/30 to-transparent transition-opacity duration-300" data-glide-dir="<">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white ml-2" viewBox="0 0 24 24" stroke="currentColor" fill="none">

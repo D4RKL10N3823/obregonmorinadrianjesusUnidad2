@@ -2,26 +2,7 @@
 {% load static %}
 {% load form_filters %}
 
-{% block extra_scripts %}
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const messageInput = document.querySelector('#id_message');
-            const form = document.querySelector('#message-form');
-            const chatBox = document.querySelector('#chat-box');
-
-            // Mostrar el último mensaje
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            // Enviar mensaje con Enter
-            messageInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    form.submit();
-                }
-            });
-        });
-    </script>
-{% endblock %}
+{% block extra_scripts %}<script src="{% static 'js/chat.js' %}?v=2"></script>{% endblock %}
 
 {% block title %}Chat de Ayuda{% endblock %}
 {% block content %}
@@ -76,4 +57,5 @@
             </div>
         </form>
     </div>
+    {{ conversation.pk|json_script:"conversationId" }}
 {% endblock %}

@@ -1,6 +1,7 @@
 window.addEventListener('load', () => {
+    // Selecciona todas las cards con la clase .glide para mostrarlas de 5.5 en 5.5 en el carrusel
     document.querySelectorAll('.glide').forEach(glideEl => {
-        new Glide(glideEl, {
+        const glide = new Glide(glideEl, {
             type: 'carousel',
             perView: 5.5,
             gap: 20,
@@ -12,9 +13,12 @@ window.addEventListener('load', () => {
                 768:  { perView: 2 },
                 480:  { perView: 1 },
             },
-        }).mount();
-    });
+        });
 
+        glide.mount();
+    });
+    
+    // Seleccionar un anime aleatorio al hacer doble click en el titulo de la categoria
     document.querySelectorAll('.category-title').forEach((categoryTitle, index) => {
         categoryTitle.addEventListener('dblclick', () => {
             const categoriesData = JSON.parse(document.getElementById('categories-data').textContent);

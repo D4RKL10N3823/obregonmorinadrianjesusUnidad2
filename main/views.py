@@ -14,10 +14,15 @@ from django.core.mail import EmailMessage
 from django.core.exceptions import PermissionDenied
 from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse_lazy, reverse
+from .utils.recaptcha import verify_recaptcha
+from django.utils.timezone import make_aware
+from datetime import datetime
 from .forms import CustomUserCreationForm, ContactForm, SuggestionForm, HelpMessageForm
 from .models import Anime, User, Episode, Comment, Conversation, Suggestion, Category
-from .utils.recaptcha import verify_recaptcha
 import json
+import time
+
+MONTHS_ES = {'January': 'enero', 'February': 'febrero', 'March': 'marzo', 'April': 'abril', 'May': 'mayo', 'June': 'junio', 'July': 'julio', 'August': 'agosto', 'September': 'septiembre', 'October': 'octubre', 'November': 'noviembre', 'December': 'diciembre',}
 
 # Vista del mapa del sitio
 class SiteMapView(TemplateView):  
@@ -128,7 +133,7 @@ class SearchBar(ListView):
         context['search_value'] = self.request.GET.get('search', '')
         return context
 
-    # Búsqueda asincrona
+    # Búsqueda asíncrona
     def render_to_response(self, context, **response_kwargs):
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             data = [
@@ -184,14 +189,67 @@ class EpisodeDetail(LoginRequiredMixin, DetailView):
         context['user'] = self.request.user if self.request.user.is_authenticated else None
         return context
     
-    # Maneja el envio de comentarios en el capitulo
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        content = request.POST.get('content')
+        content = request.POST.get("content")
+        
+        if content:
+            Comment.objects.create(
+                episode=self.object,
+                anime=self.object.anime,
+                user=request.user,
+                content=content
+            )
+        
+        return redirect(self.request.path_info)
 
-        if request.user.is_authenticated and content:
-            Comment.objects.create(user=request.user, anime=self.object.anime, episode=self.object, content=content)
-        return HttpResponseRedirect(self.request.path_info)
+    # Maneja el envio de comentarios en el capitulo
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest' and self.request.GET.get("comment") == "1":
+            return self.comment_async()
+        return super().render_to_response(context, **response_kwargs)
+
+    def comment_async(self):
+        episode = self.get_object()
+
+        try:
+            last_ts = float(self.request.GET.get("after", "0"))
+            last_dt = make_aware(datetime.fromtimestamp(last_ts))
+        except ValueError:
+            last_dt = None
+
+        start_time = time.time()
+        timeout = 25  # segundos
+
+        while time.time() - start_time < timeout:
+            if last_dt:
+                new_comments = Comment.objects.filter(episode=episode, created_at__gt=last_dt)
+            else:
+                new_comments = Comment.objects.filter(episode=episode).order_by('created_at')
+
+            if new_comments.exists():
+                # Solo devolvemos mensajes que realmente son más nuevos
+                comments_filtered = []
+                for comment in new_comments:
+                    comment_ts = comment.created_at.timestamp()
+                    if comment_ts > last_ts:
+                        date = comment.created_at
+                        month = MONTHS_ES[date.strftime('%B')]
+                        format_date = f"{date.day} de {month} de {date.year} a las {date.strftime('%H:%M')}"
+
+                        comments_filtered.append({
+                            'user': comment.user.username,
+                            'comment': comment.content,
+                            'created_at': format_date,
+                            'timestamp': comment_ts,
+                        })
+
+                if comments_filtered:
+                    return JsonResponse(comments_filtered, safe=False)
+
+            time.sleep(0.2)
+
+        return JsonResponse([], safe=False)
     
 
 # Vista de contacto
@@ -253,7 +311,7 @@ class ConversationList(LoginRequiredMixin, ListView):
             return Conversation.objects.all()
         else:
             return Conversation.objects.filter(user=user)
-
+        
 
 # Vista del chat de ayuda
 class HelpChat(LoginRequiredMixin, FormView, DetailView):
@@ -291,6 +349,59 @@ class HelpChat(LoginRequiredMixin, FormView, DetailView):
         context['chat_messages'] = self.get_object().messages.order_by('created_at')
         return context
 
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest' and self.request.GET.get("message") == "1":
+            return self.chat_async()
+        return super().render_to_response(context, **response_kwargs)
+
+    # Maneja el chat de forma asíncrona
+    def chat_async(self):
+        conversation = self.get_object()
+
+        try:
+            last_ts = float(self.request.GET.get("after", "0"))
+            last_dt = make_aware(datetime.fromtimestamp(last_ts))
+        except ValueError:
+            last_dt = None
+
+        start_time = time.time()
+        timeout = 25  # segundos
+
+        while time.time() - start_time < timeout:
+            if last_dt:
+                new_messages = conversation.messages.filter(
+                    created_at__gt=last_dt
+                ).order_by('created_at').select_related('sender')
+            else:
+                new_messages = conversation.messages.all().order_by('created_at').select_related('sender')
+
+            if new_messages.exists():
+                # Solo devolvemos mensajes que realmente son más nuevos
+                msgs_filtered = []
+                for msg in new_messages:
+                    msg_ts = msg.created_at.timestamp()
+                    if msg_ts > last_ts:
+                        date = msg.created_at
+                        month = MONTHS_ES[date.strftime('%B')]
+                        format_date = f"{date.day} de {month} de {date.year} a las {date.strftime('%H:%M')}"
+
+                        msgs_filtered.append({
+                            'sender': msg.sender.username,
+                            'icon': msg.sender.icon.url if msg.sender.icon else '',
+                            'message': msg.message,
+                            'created_at': format_date,
+                            'timestamp': msg_ts,
+                            'is_user': msg.sender == self.request.user
+                        })
+
+                if msgs_filtered:
+                    return JsonResponse(msgs_filtered, safe=False)
+
+            time.sleep(0.5)
+
+        return JsonResponse([], safe=False)
+
+        
 
 # Vista para redirigir al usuario a su conversación o a la lista de conversaciones si es administrador
 class RedirectToConversation(LoginRequiredMixin, View):

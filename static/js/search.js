@@ -2,6 +2,7 @@ function truncateChars(str, n) {
     return str.length > n ? str.slice(0, n) + '…' : str;
 }
 
+// Búsqueda asíncrona
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     const clearBtn = document.getElementById('clearSearch');
