@@ -3,7 +3,11 @@ a {
 }
 
 a:hover {
-    color: #FFBC0E !important;
+    color: #FFBC0E;
+}
+
+#view-anime-btn:hover {
+    color: black;
 }
 
 @keyframes fadeIn {

@@ -108,8 +108,14 @@ class AnimeList(ListView):
         # Agregamos los animes por categoría en un dict serializable
         categorias_json = {}
         for i, categoria in enumerate(categorias, start=1):
-            animes = categoria.animes.all().values('title')
-            categorias_json[f'animes-{i}'] = list(animes)
+            animes = []
+            for anime in categoria.animes.all():
+                animes.append({
+                    'title': anime.title,
+                    'image': anime.image_detail.url,
+                    'url': reverse('anime_detail', args=[anime.title])
+                })
+            categorias_json[f'animes-{i}'] = animes
 
         # Convertimos a JSON para pasarlo como un único bloque al template
         context['categories_json'] = json.dumps(categorias_json, cls=DjangoJSONEncoder)
