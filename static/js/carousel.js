@@ -48,15 +48,21 @@ window.addEventListener('load', () => {
         let interval = 0.05;
 
         const tl = gsap.timeline();
-
+        
         tl.to({}, {
             duration: totalFrames * interval,
+            // Muestra la animación de las imagenes y el titulo de los animes de forma aleatoria
             onUpdate: () => {
                 const randomAnime = allAnimes[Math.floor(Math.random() * allAnimes.length)];
                 img.src = randomAnime.image;
                 img.classList.remove("hidden");
+
+                animeTitle.textContent =  randomAnime.title;
+                animeTitle.classList.remove("hidden");
+
                 gsap.fromTo(img, { opacity: 0.1, scale: 1.1 }, { opacity: 0.2, scale: 1, duration: 0.08 });
             },
+            // Muestra el anime que se escogio aleatoriamente con su titulo e imagen
             onComplete: () => {
                 const finalAnime = allAnimes[Math.floor(Math.random() * allAnimes.length)];
                 animeQuestion.classList.add("hidden");
