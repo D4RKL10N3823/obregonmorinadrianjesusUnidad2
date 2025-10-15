@@ -1,6 +1,5 @@
-# Proyecto Unidad 3 – TakosuAnime
+# Proyecto Unidad 2 – TakosuAnime
 
-Este proyecto fue desarrollado como parte del **proyecto final de la materia de Desarrollo Web Profesional**.  
 Se trata de una **plataforma estilo Crunchyroll**: un **portal de catálogo de animes y episodios**, donde los usuarios pueden registrarse, iniciar sesión, recuperar contraseñas y navegar por un catálogo organizado de series.  
 No es un sistema de streaming en tiempo real, sino un **portal interactivo de contenidos multimedia** con seguridad y gestión de usuarios.
 
