@@ -283,7 +283,41 @@ class ConversationList(LoginRequiredMixin, ListView):
             return Conversation.objects.all()
         else:
             return Conversation.objects.filter(user=user)
-        
+
+
+# Vista para hacer busquedas de los animes
+class SearchBar(ListView):
+    model = Anime
+    context_object_name = 'animes'
+    template_name = 'search.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get('search', '')
+        return Anime.objects.filter(title__icontains=query) if query else Anime.objects.all()
+
+    # Búsqueda
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_value'] = self.request.GET.get('search', '')
+        return context
+
+    # Búsqueda asíncrona
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            data = [
+                {
+                    "title": anime.title,
+                    "total_episodes": anime.total_episodes,
+                    "image": anime.image_card.url,
+                    "description": anime.description,
+                    "url": reverse('anime_detail', args=[anime.title])
+                }
+                for anime in context['animes']
+            ]
+            return JsonResponse(data, safe=False)
+        else:
+            return super().render_to_response(context, **response_kwargs)
+
 
 # Vista del chat de ayuda
 class HelpChat(LoginRequiredMixin, FormView, DetailView):
