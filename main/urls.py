@@ -24,6 +24,7 @@ urlpatterns = [
     path('anime/<str:pk>/', AnimeDetail.as_view(), name='anime_detail'),
     path('<str:anime_title>/episode-<int:episode_number>/', EpisodeDetail.as_view(), name='episode_detail'),
 
+    path('search/', SearchBar.as_view(), name='search'),
     path('profile/', Profile.as_view(), name='profile'),
 
     path('help/', Help.as_view(), name='help'),
