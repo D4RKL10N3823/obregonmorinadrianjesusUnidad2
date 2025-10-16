@@ -1,8 +1,5 @@
 {% extends "base.html" %}
 {% load form_filters %}
-{% block extra_scripts %}
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-{% endblock %}
 
 {% block title %}Registrarse{% endblock %}
 
@@ -42,10 +39,6 @@
         {% for err in form.password2.errors %}
           <p class="text-red-500 text-sm mt-1">{{ err }}</p>
         {% endfor %}
-      </div>
-
-      <div class="mb-4">
-        <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_SITE_KEY }}"></div>
       </div>
 
       <button id="submit-btn" type="submit"class="[background-color:#FFBC0E] w-full font-semibold py-2 px-4 rounded-sm hover:bg-yellow-600">
